@@ -31,7 +31,7 @@ def make_predictions(model, data):
     # To get our test labels we need to unravel our test data batch Dataset
     y_labels = []
     for images, labels in data.unbatch():
-        y_labels.append(labels.numpy().argmax())
+        y_labels.append(labels.numpy())
 
     return y_labels, pred_classes
 
