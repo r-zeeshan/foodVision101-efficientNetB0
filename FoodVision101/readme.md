@@ -42,8 +42,8 @@ There is also a version of it available on Kaggle. https://www.kaggle.com/dansbe
 
 <h3>4. Result</h3>
 
-Trained a computer vision model with competitive performance to a research paper and in far less time (our model took ~20 minutes to train versus DeepFood's quoted 2-3 days) and model beat the results mentioned in the DeepFood paper for Food101 (DeepFood's 77.4% top-1 accuracy versus our ~79% top-1 accuracy).
+Trained a computer vision model with competitive performance to a research paper and in far less time (our model took ~60 minutes to train versus DeepFood's quoted 2-3 days) and model beat the results mentioned in the DeepFood paper for Food101 (DeepFood's 77.4% top-1 accuracy versus our ~83.8% top-1 accuracy).
 
 <Br>
-If you liked what you saw, want to have a chat with me about the portfolio, work opportunities, or collaboration, shoot an email at <a href="mailto:mishraanmol258@gmail.com?subject=Hello%20Anmol" target="_top">
-mishraanmol258@gmail.com</a> 
+If you liked what you saw, want to have a chat with me about the portfolio, work opportunities, or collaboration, shoot an email at <a href="mailto:zeeshanrajpootkr@gmail.com?subject=Hello%20Anmol" target="_top">
+zeeshanrajpootkr@gmail.com</a> 
