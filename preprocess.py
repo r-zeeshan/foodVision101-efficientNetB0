@@ -15,7 +15,7 @@ def resize_image(image, label, image_shape=224):
         tf.Tensor: The label tensor.
     """
     image = tf.image.resize(image, [image_shape, image_shape])
-    return tf.case(image, tf.float32), label
+    return tf.cast(image, tf.float32), label
 
 
 
@@ -40,4 +40,3 @@ def batch_data(train_data, test_data):
 
     return train_data, test_data
 
-    
