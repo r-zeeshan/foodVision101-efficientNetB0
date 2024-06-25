@@ -26,6 +26,7 @@ def make_predictions(model, data):
 
     return y_labels, pred_classes
 
+
 from sklearn.metrics import classification_report
 def get_class_f1_scores(y_labels, class_names, pred_classes):
     """
