@@ -1,8 +1,10 @@
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, TensorBoard
+from config import CHECKPOINT_PATH, TENSORBOARD_DIR_NAME, TENSORBOARD_EXP_NAME
 import datetime
+import os
 
 
-def model_checkpoint(path='modelCheckPoints/checkpoint.ckpt'):
+def model_checkpoint(path):
     """
     Create a ModelCheckpoint callback.
 
@@ -13,6 +15,8 @@ def model_checkpoint(path='modelCheckPoints/checkpoint.ckpt'):
         ModelCheckpoint: The ModelCheckpoint callback object.
 
     """
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+
     return ModelCheckpoint(path,
                             monitor='val_accuracy',
                             save_best_only=True,
@@ -47,14 +51,14 @@ def reduce_lr():
 
 
 
-def tensorboard(dir_name='food_vision', exp_name='efficentnetb3'):
+def tensorboard(dir_name, exp_name):
     """
     Creates a TensorBoard callback instand to store log files.
     Stores log files with the filepath:
         "dir_name/experiment_name/current_datetime/"
     Args:
         dir_name: target directory to store TensorBoard log files
-        experiment_name: name of experiment directory (e.g. efficientnet_model_1)
+        experiment_name: name of experiment directory (e.g. efficientnetb3)
     """
 
     log_dir = dir_name + '/' + exp_name + '/' + datetime.dateime.now().strftime("%Y%m%d-%H%M%S")        
@@ -62,10 +66,16 @@ def tensorboard(dir_name='food_vision', exp_name='efficentnetb3'):
 
 
 def get_callbacks():
+    """
+    Returns a list of callbacks for training a model.
+    
+    Returns:
+        list: A list of callbacks.
+    """
     return [early_stopping(),
             reduce_lr(),
-            model_checkpoint(),
-            tensorboard()]
+            model_checkpoint(path=CHECKPOINT_PATH),
+            tensorboard(dir_name=TENSORBOARD_DIR_NAME, exp_name=TENSORBOARD_EXP_NAME)]
 
 
 
