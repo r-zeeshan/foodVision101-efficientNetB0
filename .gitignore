@@ -2,3 +2,5 @@ FoodVision101/
 demo.ipynb
 steps.txt
 __pycache__/
+modelCheckPoints/
+model/
