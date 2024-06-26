@@ -61,7 +61,7 @@ def tensorboard(dir_name, exp_name):
         experiment_name: name of experiment directory (e.g. efficientnetb3)
     """
 
-    log_dir = dir_name + '/' + exp_name + '/' + datetime.dateime.now().strftime("%Y%m%d-%H%M%S")        
+    log_dir = dir_name + '/' + exp_name + '/' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")        
     return TensorBoard(log_dir=log_dir)
 
 
@@ -76,10 +76,3 @@ def get_callbacks():
             reduce_lr(),
             model_checkpoint(path=CHECKPOINT_PATH),
             tensorboard(dir_name=TENSORBOARD_DIR_NAME, exp_name=TENSORBOARD_EXP_NAME)]
-
-
-
-    
-    
-
-

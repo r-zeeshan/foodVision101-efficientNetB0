@@ -20,6 +20,6 @@ METRICS = ['accuracy']
 ## PATHS
 MODEL_PATH  = 'model/efficient_netb3_fine_tuned.h5'
 HISTORY_PATH = 'model/training_history.pkl'
-CHECKPOINT_PATH = 'modelCheckPoints/checkpoint.ckpt'
+CHECKPOINT_PATH = 'modelCheckPoints/checkpoint.weights.h5'
 TENSORBOARD_DIR_NAME = 'food_vision'
 TENSORBOARD_EXP_NAME = 'efficientNetB3'
