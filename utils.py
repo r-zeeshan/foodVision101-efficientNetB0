@@ -218,30 +218,33 @@ def plot_loss_curves(history):
     """
     Returns separate loss curves for training and validation metrics.
     Args:
-        history: TensorFlow model History object (see: https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/History)
+        history: Dictionary containing training history.
     """ 
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
+    loss = history['loss']
+    val_loss = history['val_loss']
 
-    accuracy = history.history['accuracy']
-    val_accuracy = history.history['val_accuracy']
+    accuracy = history['accuracy']
+    val_accuracy = history['val_accuracy']
 
-    epochs = range(len(history.history['loss']))
+    epochs = range(len(history['loss']))
 
     # Plot loss
+    plt.figure(figsize=(10, 6))
     plt.plot(epochs, loss, label='training_loss')
     plt.plot(epochs, val_loss, label='val_loss')
     plt.title('Loss')
     plt.xlabel('Epochs')
     plt.legend()
+    plt.show()
 
     # Plot accuracy
-    plt.figure()
+    plt.figure(figsize=(10, 6))
     plt.plot(epochs, accuracy, label='training_accuracy')
     plt.plot(epochs, val_accuracy, label='val_accuracy')
     plt.title('Accuracy')
     plt.xlabel('Epochs')
-    plt.legend();
+    plt.legend()
+    plt.show()
 
 
 # Function to evaluate: accuracy, precision, recall, f1-score
