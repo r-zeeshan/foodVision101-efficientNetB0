@@ -28,7 +28,6 @@ history = model.fit(train_data,
                     epochs=50,
                     steps_per_epoch=len(train_data),
                     validation_data=test_data,
-                    validation_steps=int(0.1 * len(test_data)),
                     callbacks=callbacks)
 
 model.evaluate(test_data)
