@@ -33,6 +33,36 @@ def make_prediction(model, data):
 
 
 
+def plot_loss_curves(history):
+    """
+    Returns separate loss curves for training and validation metrics.
+    Args:
+        history: TensorFlow model History object (see: https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/History)
+    """ 
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+
+    accuracy = history.history['accuracy']
+    val_accuracy = history.history['val_accuracy']
+
+    epochs = range(len(history.history['loss']))
+
+    # Plot loss
+    plt.plot(epochs, loss, label='training_loss')
+    plt.plot(epochs, val_loss, label='val_loss')
+    plt.title('Loss')
+    plt.xlabel('Epochs')
+    plt.legend()
+
+    # Plot accuracy
+    plt.figure()
+    plt.plot(epochs, accuracy, label='training_accuracy')
+    plt.plot(epochs, val_accuracy, label='val_accuracy')
+    plt.title('Accuracy')
+    plt.xlabel('Epochs')
+    plt.legend();
+
+
 def get_class_f1_scores(y_labels, class_names, pred_classes):
     """
     Get the F1 scores for the classes in data.
@@ -62,12 +92,14 @@ def get_class_f1_scores(y_labels, class_names, pred_classes):
     return class_f1_scores
 
 
-def plot_f1_scores(class_f1_scores):
+def plot_f1_scores(class_f1_scores, model_name, savefig=False):
     """
     Makes a bar plot of F1 scores of different classes.
 
     Args:
         class_f1_scores (dict) : dictionary of f1 scores of various classes and their names.
+        model_name (str) : name of the model
+        savefig (bool) : whether to save the plot as an image or not (default=False)
 
     Returns:
         Plots a bar plot comparing different f1-scores
@@ -86,6 +118,8 @@ def plot_f1_scores(class_f1_scores):
     plt.ylabel("Class Names")
     plt.title("F1 Scores for different classes")
 
+    if savefig:
+        plt.savefig("plots/f1_scores_{}.png".format(model_name))
 
     plt.show()
 
@@ -214,54 +248,23 @@ def pred_and_plot(model, filename, class_names):
     plt.axis(False);
 
 
-def plot_loss_curves(history):
-    """
-    Returns separate loss curves for training and validation metrics.
-    Args:
-        history: Dictionary containing training history.
-    """ 
-    loss = history['loss']
-    val_loss = history['val_loss']
-
-    accuracy = history['accuracy']
-    val_accuracy = history['val_accuracy']
-
-    epochs = range(len(history['loss']))
-
-    # Plot loss
-    plt.figure(figsize=(10, 6))
-    plt.plot(epochs, loss, label='training_loss')
-    plt.plot(epochs, val_loss, label='val_loss')
-    plt.title('Loss')
-    plt.xlabel('Epochs')
-    plt.legend()
-    plt.show()
-
-    # Plot accuracy
-    plt.figure(figsize=(10, 6))
-    plt.plot(epochs, accuracy, label='training_accuracy')
-    plt.plot(epochs, val_accuracy, label='val_accuracy')
-    plt.title('Accuracy')
-    plt.xlabel('Epochs')
-    plt.legend()
-    plt.show()
-
 
 # Function to evaluate: accuracy, precision, recall, f1-score
 def calculate_results(y_true, y_pred):
-  """
-  Calculates model accuracy, precision, recall and f1 score of a binary classification model.
-  Args:
-      y_true: true labels in the form of a 1D array
-      y_pred: predicted labels in the form of a 1D array
-  Returns a dictionary of accuracy, precision, recall, f1-score.
-  """
-  # Calculate model accuracy
-  model_accuracy = accuracy_score(y_true, y_pred) * 100
-  # Calculate model precision, recall and f1 score using "weighted average
-  model_precision, model_recall, model_f1, _ = precision_recall_fscore_support(y_true, y_pred, average="weighted")
-  model_results = {"accuracy": model_accuracy,
-                  "precision": model_precision,
-                  "recall": model_recall,
-                  "f1": model_f1}
-  return model_results
+    """
+    Calculates model accuracy, precision, recall and f1 score of a classification model.
+    Args:
+        y_true: true labels in the form of a 1D array
+        y_pred: predicted labels in the form of a 1D array
+    Returns a dictionary of accuracy, precision, recall, f1-score.
+    """
+    # Calculate model accuracy
+    model_accuracy = accuracy_score(y_true, y_pred)
+    # Calculate model precision, recall and f1 score using "weighted average"
+    model_precision, model_recall, model_f1, _ = precision_recall_fscore_support(y_true, y_pred, average="weighted")
+    model_results = {"accuracy": model_accuracy,
+                     "precision": model_precision,
+                     "recall": model_recall,
+                     "f1": model_f1}
+    return model_results
+

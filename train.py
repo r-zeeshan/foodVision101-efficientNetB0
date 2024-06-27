@@ -1,4 +1,3 @@
-import tensorflow as tf
 from dataset import get_dataset
 from preprocess import batch_data
 from architecture import create_model
@@ -6,10 +5,6 @@ from callbacks import get_callbacks
 from config import *
 import pickle
 import os
-
-
-### Setting a mixed precision global policy
-tf.keras.mixed_precision.set_global_policy(policy="mixed_float16")
 
 
 ### Loading and preprocessing the Dataset
@@ -36,6 +31,7 @@ history = model.fit(train_data,
                     validation_steps=int(0.1 * len(test_data)),
                     callbacks=callbacks)
 
+model.evaluate(test_data)
 
 os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
 os.makedirs(os.path.dirname(HISTORY_PATH), exist_ok=True)
@@ -45,4 +41,4 @@ os.makedirs(os.path.dirname(HISTORY_PATH), exist_ok=True)
 model.save(MODEL_PATH)
 
 with open(HISTORY_PATH, 'wb') as file:
-    pickle.dump(history.history, file)
+    pickle.dump(history, file)

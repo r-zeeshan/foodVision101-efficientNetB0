@@ -1,6 +1,5 @@
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau, TensorBoard
-from config import CHECKPOINT_PATH, TENSORBOARD_DIR_NAME, TENSORBOARD_EXP_NAME
-import datetime
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from config import CHECKPOINT_PATH
 import os
 
 
@@ -50,21 +49,6 @@ def reduce_lr():
                                 min_lr=1e-7)
 
 
-
-def tensorboard(dir_name, exp_name):
-    """
-    Creates a TensorBoard callback instand to store log files.
-    Stores log files with the filepath:
-        "dir_name/experiment_name/current_datetime/"
-    Args:
-        dir_name: target directory to store TensorBoard log files
-        experiment_name: name of experiment directory (e.g. efficientnetb3)
-    """
-
-    log_dir = dir_name + '/' + exp_name + '/' + datetime.datetime.now().strftime("%Y%m%d-%H%M%S")        
-    return TensorBoard(log_dir=log_dir)
-
-
 def get_callbacks():
     """
     Returns a list of callbacks for training a model.
@@ -74,5 +58,4 @@ def get_callbacks():
     """
     return [early_stopping(),
             reduce_lr(),
-            model_checkpoint(path=CHECKPOINT_PATH),
-            tensorboard(dir_name=TENSORBOARD_DIR_NAME, exp_name=TENSORBOARD_EXP_NAME)]
+            model_checkpoint(path=CHECKPOINT_PATH)]
