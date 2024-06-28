@@ -1,7 +1,7 @@
 import streamlit as st
 import tensorflow as tf
 import numpy as np
-from utils import load_and_prep_image, plot_top_5_probs, load_image_from_url, load_image_from_base64
+from utils import load_and_prep_image, plot_top_10_probs, load_image_from_url, load_image_from_base64
 from config import MODEL_PATH
 import os
 import re
@@ -67,8 +67,8 @@ with cols[1]:
 if uploaded_file is not None or st.session_state.image_url:
     st.markdown("---")
     if uploaded_file is not None:
-        fig = plot_top_5_probs(pred_prob, class_names)
+        fig = plot_top_10_probs(pred_prob, class_names)
         st.plotly_chart(fig)
     elif st.session_state.image_url:
-        fig = plot_top_5_probs(pred_prob, class_names)
+        fig = plot_top_10_probs(pred_prob, class_names)
         st.plotly_chart(fig)
