@@ -20,7 +20,7 @@ def resize_image(image, label, image_shape=224):
     return tf.cast(image, tf.float32), label
 
 
-def batch_data(train_data, test_data, strategy):
+def batch_data(train_data, test_data):
     """
     Preprocesses and batches the train and test data.
 
@@ -32,7 +32,7 @@ def batch_data(train_data, test_data, strategy):
     Returns:
         tuple: A tuple containing the preprocessed and batched train data and test data.
     """
-    batch_size = 32 * strategy.num_replicas_in_sync  # Adjust the batch size to the number of replicas
+    batch_size = 32
 
     train_data = train_data.map(map_func=resize_image,
                                 num_parallel_calls=tf.data.AUTOTUNE)

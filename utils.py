@@ -1,11 +1,16 @@
 import itertools
 import numpy as np
 import pandas as pd
-import seaborn as sns
-import tensorflow as tf
 import matplotlib.pyplot as plt
 from sklearn.metrics import classification_report, confusion_matrix, accuracy_score, precision_recall_curve, roc_curve, auc, precision_recall_fscore_support
 import os
+import plotly.express as px
+import plotly.figure_factory as ff
+import plotly.graph_objects as go
+import tensorflow as tf
+import base64
+from io import BytesIO
+import requests
 
 def save_plot(plot, filename):
     """Save a plot to the specified file."""
@@ -43,32 +48,50 @@ def get_class_f1_scores(y_labels, class_names, pred_classes):
         Dictionary of F1 Scores of the classes in the dataset
     """
     classification_report_dict = classification_report(y_true=y_labels, y_pred=pred_classes, output_dict=True)
-    class_f1_scores = {class_names[int(k)]: v['f1-score'] for k, v in classification_report_dict.items() if k != 'accuracy'}
+    class_f1_scores = {}
+    for k, v in classification_report_dict.items():
+        try:
+            class_index = int(k)
+            class_f1_scores[class_names[class_index]] = v['f1-score']
+        except ValueError:
+            # Skip keys that are not integers
+            continue
     return class_f1_scores
+
 
 
 def plot_f1_scores(class_f1_scores, save_path=None):
     """
-    Makes a bar plot of F1 scores of different classes.
+    Makes an interactive bar plot of F1 scores of different classes using Plotly.
 
     Args:
         class_f1_scores (dict) : dictionary of f1 scores of various classes and their names.
-        save_path (str) : path to save the plot
+        save_path (str) : path to save the plot (as HTML)
 
     Returns:
-        Plots a bar plot comparing different f1-scores
+        Plots an interactive bar plot comparing different f1-scores
     """
-    f1_scores = pd.DataFrame({"Class Names": list(class_f1_scores.keys()), "F1 Scores": list(class_f1_scores.values())}).sort_values("F1 Scores", ascending=True)
-    plot = sns.barplot(x="F1 Scores", y="Class Names", data=f1_scores, palette='viridis')
-    plt.xlabel("F1 Score")
-    plt.ylabel("Class Names")
-    plt.title("F1 Scores for different classes")
+    f1_scores = pd.DataFrame({
+        "Class Names": list(class_f1_scores.keys()),
+        "F1 Scores": list(class_f1_scores.values())
+    }).sort_values("F1 Scores", ascending=True)
+    
+    fig = px.bar(f1_scores, 
+                 x="F1 Scores", 
+                 y="Class Names", 
+                 orientation='h',
+                 title="F1 Scores for different classes",
+                 labels={"F1 Scores": "F1 Score", "Class Names": "Class Names"},
+                 height=2000)
+    
     if save_path:
-        save_plot(plot, save_path)
-    plt.show()
+        fig.write_html(save_path)
+    
+    fig.show()
 
 
-def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_size=15, norm=False, save_path=None): 
+
+def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(100, 100), text_size=15, norm=False, save_path=None): 
     """Makes a labelled confusion matrix comparing predictions and ground truth labels."""
     cm = confusion_matrix(y_true, y_pred)
     cm_norm = cm.astype("float") / cm.sum(axis=1)[:, np.newaxis]
@@ -89,93 +112,125 @@ def make_confusion_matrix(y_true, y_pred, classes=None, figsize=(10, 10), text_s
         plt.savefig(save_path)
     plt.show()
 
+def plot_learning_rate(history, save_path=None):
+    """
+    Plots the learning rate over time using Plotly.
+    Args:
+        history: TensorFlow model History object.
+        save_path: Path to save the plot (as HTML).
+    """
+    lr = history.history['learning_rate']
+    epochs = range(len(lr))
+    
+    fig = px.line(x=epochs, y=lr, labels={'x': 'Epochs', 'y': 'Learning Rate'}, title='Learning Rate Over Time')
+    
+    if save_path:
+        fig.write_html(f"{save_path}_learning_rate.html")
+    
+    fig.show()
+
 
 def plot_loss_curves(history, save_path=None):
     """
-    Returns separate loss curves for training and validation metrics.
+    Returns separate loss curves for training and validation metrics using Plotly.
     Args:
         history: TensorFlow model History object (see: https://www.tensorflow.org/api_docs/python/tf/keras/callbacks/History)
-    """ 
+        save_path: Path to save the plot (as HTML).
+    """
     loss = history['loss']
     val_loss = history['val_loss']
     accuracy = history['accuracy']
     val_accuracy = history['val_accuracy']
     epochs = range(len(history['loss']))
-    plt.plot(epochs, loss, label='training_loss')
-    plt.plot(epochs, val_loss, label='val_loss')
-    plt.title('Loss')
-    plt.xlabel('Epochs')
-    plt.legend()
+
+    # Create a figure for loss
+    fig_loss = go.Figure()
+    fig_loss.add_trace(go.Scatter(x=list(epochs), y=loss, mode='lines+markers', name='training_loss'))
+    fig_loss.add_trace(go.Scatter(x=list(epochs), y=val_loss, mode='lines+markers', name='val_loss'))
+    fig_loss.update_layout(title='Loss Over Epochs',
+                           xaxis_title='Epochs',
+                           yaxis_title='Loss')
+    
     if save_path:
-        plt.savefig(f"{save_path}_loss.png")
-    plt.show()
-    plt.figure()
-    plt.plot(epochs, accuracy, label='training_accuracy')
-    plt.plot(epochs, val_accuracy, label='val_accuracy')
-    plt.title('Accuracy')
-    plt.xlabel('Epochs')
-    plt.legend()
+        fig_loss.write_html(f"{save_path}_loss.html")
+    
+    fig_loss.show()
+
+    # Create a figure for accuracy
+    fig_acc = go.Figure()
+    fig_acc.add_trace(go.Scatter(x=list(epochs), y=accuracy, mode='lines+markers', name='training_accuracy'))
+    fig_acc.add_trace(go.Scatter(x=list(epochs), y=val_accuracy, mode='lines+markers', name='val_accuracy'))
+    fig_acc.update_layout(title='Accuracy Over Epochs',
+                          xaxis_title='Epochs',
+                          yaxis_title='Accuracy')
+    
     if save_path:
-        plt.savefig(f"{save_path}_accuracy.png")
-    plt.show()
+        fig_acc.write_html(f"{save_path}_accuracy.html")
+    
+    fig_acc.show()
 
 
-def plot_learning_rate(history, save_path=None):
+
+
+def plot_precision_recall_curve(y_true, y_pred, class_names, save_path=None):
     """
-    Plots the learning rate over time.
-    Args:
-        history: TensorFlow model History object.
-        save_path: Path to save the plot.
-    """
-    lr = history['learning_rate']
-    epochs = range(len(history['learning_rate']))
-    plt.plot(epochs, lr, label='learning_rate')
-    plt.title('Learning Rate')
-    plt.xlabel('Epochs')
-    plt.ylabel('Learning Rate')
-    plt.legend()
-    if save_path:
-        plt.savefig(f"{save_path}_learning_rate.png")
-    plt.show()
-
-
-def plot_precision_recall_curve(y_true, y_pred, save_path=None):
-    """
-    Plots the precision-recall curve.
+    Plots the precision-recall curve for each class using Plotly.
     Args:
         y_true: True labels.
         y_pred: Predicted probabilities.
-        save_path: Path to save the plot.
+        class_names: List of class names.
+        save_path: Path to save the plot (as HTML).
     """
-    precision, recall, _ = precision_recall_curve(y_true, y_pred)
-    plt.plot(recall, precision, marker='.')
-    plt.title('Precision-Recall Curve')
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
+    fig = go.Figure()
+    
+    for i, class_name in enumerate(class_names):
+        # Compute precision-recall pairs for each class
+        y_true_binary = np.array(y_true) == i
+        precision, recall, _ = precision_recall_curve(y_true_binary.astype(int), y_pred[:, i])
+        
+        fig.add_trace(go.Scatter(x=recall, y=precision, mode='lines', name=f'{class_name}'))
+
+    fig.update_layout(title='Precision-Recall Curve for Each Class',
+                      xaxis_title='Recall',
+                      yaxis_title='Precision')
+    
     if save_path:
-        plt.savefig(f"{save_path}_precision_recall_curve.png")
-    plt.show()
+        fig.write_html(save_path)
+    
+    fig.show()
 
 
-def plot_roc_curve(y_true, y_pred, save_path=None):
+
+def plot_roc_curve(y_true, y_pred, class_names, save_path=None):
     """
-    Plots the ROC curve.
+    Plots the ROC curve for each class using Plotly.
     Args:
         y_true: True labels.
         y_pred: Predicted probabilities.
-        save_path: Path to save the plot.
+        class_names: List of class names.
+        save_path: Path to save the plot (as HTML).
     """
-    fpr, tpr, _ = roc_curve(y_true, y_pred)
-    roc_auc = auc(fpr, tpr)
-    plt.plot(fpr, tpr, label=f'ROC Curve (area = {roc_auc:0.2f})')
-    plt.plot([0, 1], [0, 1], 'k--')
-    plt.title('ROC Curve')
-    plt.xlabel('False Positive Rate')
-    plt.ylabel('True Positive Rate')
-    plt.legend(loc='lower right')
+    fig = go.Figure()
+
+    for i, class_name in enumerate(class_names):
+        # Compute ROC curve and ROC area for each class
+        y_true_binary = np.array(y_true) == i
+        fpr, tpr, _ = roc_curve(y_true_binary.astype(int), y_pred[:, i])
+        roc_auc = auc(fpr, tpr)
+        
+        fig.add_trace(go.Scatter(x=fpr, y=tpr, mode='lines', name=f'{class_name} (AUC = {roc_auc:.2f})'))
+
+    fig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', line=dict(dash='dash'), showlegend=False))
+
+    fig.update_layout(title='ROC Curve for Each Class',
+                      xaxis_title='False Positive Rate',
+                      yaxis_title='True Positive Rate')
+    
     if save_path:
-        plt.savefig(f"{save_path}_roc_curve.png")
-    plt.show()
+        fig.write_html(save_path)
+    
+    fig.show()
+
 
 
 def calculate_results(y_true, y_pred):
@@ -189,3 +244,66 @@ def calculate_results(y_true, y_pred):
     model_accuracy = accuracy_score(y_true, y_pred) * 100
     model_precision, model_recall, model_f1, _ = precision_recall_fscore_support(y_true, y_pred, average="weighted")
     return {"accuracy": model_accuracy, "precision": model_precision, "recall": model_recall, "f1": model_f1}
+
+
+def load_and_prep_image(filename, img_shape=224, scale=True):
+    """
+    Reads in an image from filename, turns it into a tensor, and reshapes it to (img_shape, img_shape, 3).
+    Parameters:
+        filename (str): string filename of target image
+        img_shape (int): size to resize target image to, default 224
+        scale (bool): whether to scale pixel values to range(0, 1), default True
+    Returns:
+        Tensor of shape (img_shape, img_shape, 3)
+    """
+    # Read in the image
+    img = tf.io.read_file(filename)
+    # Decode it into a tensor
+    img = tf.image.decode_image(img, channels=3)
+    # Resize the image
+    img = tf.image.resize(img, [img_shape, img_shape])
+    if scale:
+        return img / 255.0
+    else:
+        return img
+
+def load_image_from_url(url):
+    response = requests.get(url)
+    img = tf.image.decode_image(BytesIO(response.content).read(), channels=3)
+    return img
+
+def load_image_from_base64(base64_str):
+    """
+    Decodes a base64 string to a tensor image.
+    Args:
+        base64_str (str): Base64 encoded string of the image.
+    Returns:
+        Tensor of the image.
+    """
+    base64_str = base64_str.split(",")[1]  # Remove the data:image/jpeg;base64, part
+    image_data = base64.b64decode(base64_str)
+    img = tf.image.decode_image(BytesIO(image_data).read(), channels=3)
+    return img
+
+
+def plot_top_5_probs(probs, class_names, save_path=None):
+    """
+    Plots the top 5 probabilities from the model predictions.
+    Args:
+        probs (np.array): Array of probabilities from the model prediction.
+        class_names (list): List of class names.
+        save_path (str): Path to save the plot (optional).
+    """
+    top_5_indices = np.argsort(probs)[-5:][::-1]
+    top_5_probs = probs[top_5_indices]
+    top_5_class_names = [class_names[i] for i in top_5_indices]
+
+    fig = px.bar(x=top_5_probs, y=top_5_class_names, orientation='h',
+                 labels={'x': 'Probability', 'y': 'Class'},
+                 title='Top 5 Predictions')
+    fig.update_layout(xaxis=dict(range=[0, 1]))
+
+    if save_path:
+        fig.write_html(save_path)
+    
+    fig.show()

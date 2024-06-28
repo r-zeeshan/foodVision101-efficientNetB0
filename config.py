@@ -8,12 +8,6 @@ import tensorflow as tf
 DATASET_NAME = 'food101'
 DATASET_SPLIT = ['train', 'validation']
 
-## TPU Strategy
-resolver = tf.distribute.cluster_resolver.TPUClusterResolver()  # Detect the TPU
-tf.config.experimental_connect_to_cluster(resolver)
-tf.tpu.experimental.initialize_tpu_system(resolver)
-TPU_STRATEGY = tf.distribute.TPUStrategy(resolver)
-
 ## Model Variables
 BASE = tf.keras.applications.EfficientNetB0(include_top=False)
 SHAPE = (224, 224, 3)

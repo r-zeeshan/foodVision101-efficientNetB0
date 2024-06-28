@@ -1,0 +1,10 @@
+streamlit
+tensorflow
+tensorflow-datasets
+requests
+numpy
+pandas
+plotly
+scikit-learn
+matplotlib
+seaborn
