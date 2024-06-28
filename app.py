@@ -1,7 +1,7 @@
 import streamlit as st
 import tensorflow as tf
 import numpy as np
-from utils import load_and_prep_image, plot_top_10_probs, load_image_from_url, load_image_from_base64
+from utils import load_and_prep_image, plot_top_5_probs, load_image_from_url, load_image_from_base64
 from config import MODEL_PATH
 import os
 import re
@@ -30,43 +30,29 @@ def preprocess_and_predict(img):
     
     pred_prob = model.predict(img)[0]
     pred_class = class_names[np.argmax(pred_prob)]
-
-    st.write(f"Predicted class: {pred_class}")
-    fig = plot_top_10_probs(pred_prob, class_names)
-    st.plotly_chart(fig)
+    
+    return pred_class, pred_prob
 
 st.title("Food Image Classification")
 st.write("Upload an image of food, and the model will predict its category.")
 
 # Create a two-column layout
-# Create a two-column layout
 cols = st.columns([1, 2])
 
 # Left column for upload and URL input
 with cols[0]:
-    st.markdown("""
-        <div style="border: 1px solid #ddd; padding: 10px; border-radius: 5px; text-align: center;">
-            <p style="margin: 0;">Drag and Drop your file here</p>
-            <p style="margin: 0;">or</p>
-            <div style="margin-bottom: 10px;">
-                <input type="file" accept=".jpg, .jpeg" onchange="window.streamlitSendData({files: this.files})">
-            </div>
-            <p>enter your url/base64</p>
-        </div>
-    """, unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg"], accept_multiple_files=False)
+    st.text_input("Or enter an image URL or base64 data...", key="image_url", placeholder="Or enter an image URL or base64 data...")
 
-    uploaded_file = st.file_uploader(" ", type=["jpg", "jpeg"], accept_multiple_files=False)
-    st.text_input("", key="image_url", placeholder="Or enter an image URL or base64 data...")
-
-
-# Right column for displaying the loaded image
+# Right column for displaying the loaded image and predictions
 with cols[1]:
     if uploaded_file is not None:
         temp_file_path = os.path.join("temp", uploaded_file.name)
         with open(temp_file_path, "wb") as f:
             f.write(uploaded_file.getbuffer())
-        st.image(temp_file_path, caption='Processing...', use_column_width=True)
         img = load_and_prep_image(temp_file_path)
+        pred_class, pred_prob = preprocess_and_predict(img)
+        st.image(temp_file_path, caption=f'Predicted: {pred_class}', use_column_width=True)
         os.remove(temp_file_path)
     elif st.session_state.image_url:
         image_url = st.session_state.image_url
@@ -74,12 +60,15 @@ with cols[1]:
             img = load_image_from_base64(image_url)
         else:
             img = load_image_from_url(image_url)
-        st.image(img.numpy(), caption='Processing...', use_column_width=True)
+        pred_class, pred_prob = preprocess_and_predict(img)
+        st.image(img.numpy(), caption=f'Predicted: {pred_class}', use_column_width=True)
 
 # Display the plot in a full-width row below
 if uploaded_file is not None or st.session_state.image_url:
     st.markdown("---")
     if uploaded_file is not None:
-        preprocess_and_predict(img)
+        fig = plot_top_5_probs(pred_prob, class_names)
+        st.plotly_chart(fig)
     elif st.session_state.image_url:
-        preprocess_and_predict(img)
+        fig = plot_top_5_probs(pred_prob, class_names)
+        st.plotly_chart(fig)
