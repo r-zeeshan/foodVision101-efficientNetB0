@@ -41,23 +41,42 @@ st.write("Upload an image of food, and the model will predict its category.")
 # Create a two-column layout
 cols = st.columns([1, 2])
 
-# Left column for upload and URL input
 with cols[0]:
+    # Add custom CSS to style the uploader and text input
     st.markdown(
         """
-        <div style="width: 300px; height: 150px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-            <p style="margin-bottom: 10px;">Or enter an image URL or base64 data...</p>
-            <div style="margin-bottom: 10px;">
-                <input type="file" style="width: 100%; margin-bottom: 10px;" accept="image/jpeg,image/jpg" onchange="document.getElementById('file-name').value = this.value">
-            </div>
-            <input type="text" id="image_url" style="width: 100%;" placeholder="Or enter an image URL or base64 data...">
-        </div>
+        <style>
+        .custom-file-upload {
+            display: block;
+            margin-bottom: 10px;
+        }
+        .custom-text-input {
+            display: block;
+            width: 100%;
+            height: 50px;  /* Adjust the height as needed */
+            font-size: 16px;  /* Adjust the font size as needed */
+        }
+        </style>
         """,
         unsafe_allow_html=True
     )
 
-uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg"], accept_multiple_files=False)
-image_url = st.text_input("Or enter an image URL or base64 data...", key="image_url", placeholder="Or enter an image URL or base64 data...")
+    # Custom text input
+    st.text_input(
+        "Or enter an image URL or base64 data...", 
+        key="image_url", 
+        placeholder="Or enter an image URL or base64 data...",
+        class_="custom-text-input"
+    )
+
+    # Custom file uploader
+    uploaded_file = st.file_uploader(
+        "Choose an image...", 
+        type=["jpg", "jpeg", "png"], 
+        accept_multiple_files=False,
+        class_="custom-file-upload"
+    )
+
 
 # Right column for displaying the loaded image
 with cols[1]:
