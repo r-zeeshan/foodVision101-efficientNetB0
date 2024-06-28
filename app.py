@@ -44,35 +44,19 @@ cols = st.columns([1, 2])
 
 # Left column for upload and URL input
 with cols[0]:
-    # Custom dimensions for file uploader and text input
     st.markdown("""
-    <style>
-    .file-uploader, .text-input {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        width: 100%;
-        height: 200px; /* Custom height */
-        border: 2px dashed #ccc; /* Custom border style */
-        border-radius: 10px; /* Custom border radius */
-        padding: 10px;
-    }
-    .file-uploader input, .text-input input {
-        width: 100%; /* Full width for input fields */
-        height: 50px; /* Custom height for input fields */
-        margin-bottom: 10px; /* Space between input fields */
-    }
-    </style>
+        <div style="border: 1px solid #ddd; padding: 10px; border-radius: 5px; text-align: center;">
+            <p style="margin: 0;">Drag and Drop your file here</p>
+            <p style="margin: 0;">or</p>
+            <div style="margin-bottom: 10px;">
+                <input type="file" accept=".jpg, .jpeg" onchange="window.streamlitSendData({files: this.files})">
+            </div>
+            <p>enter your url/base64</p>
+        </div>
     """, unsafe_allow_html=True)
 
-    st.markdown('<div class="text-input">', unsafe_allow_html=True)
-    st.text_input("Or enter an image URL or base64 data...", key="image_url", placeholder="Or enter an image URL or base64 data...")
-    st.markdown('</div>', unsafe_allow_html=True)
-    
-    st.markdown('<div class="file-uploader">', unsafe_allow_html=True)
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg"], accept_multiple_files=False)
-    st.markdown('</div>', unsafe_allow_html=True)
+    uploaded_file = st.file_uploader(" ", type=["jpg", "jpeg"], accept_multiple_files=False)
+    st.text_input("", key="image_url", placeholder="Or enter an image URL or base64 data...")
 
 
 # Right column for displaying the loaded image
