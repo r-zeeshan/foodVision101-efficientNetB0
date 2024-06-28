@@ -39,43 +39,40 @@ st.title("Food Image Classification")
 st.write("Upload an image of food, and the model will predict its category.")
 
 # Create a two-column layout
+# Create a two-column layout
 cols = st.columns([1, 2])
 
+# Left column for upload and URL input
 with cols[0]:
-    # Add custom CSS to style the uploader and text input
-    st.markdown(
-        """
-        <style>
-        .custom-file-upload {
-            display: block;
-            margin-bottom: 10px;
-        }
-        .custom-text-input {
-            display: block;
-            width: 100%;
-            height: 50px;  /* Adjust the height as needed */
-            font-size: 16px;  /* Adjust the font size as needed */
-        }
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+    # Custom dimensions for file uploader and text input
+    st.markdown("""
+    <style>
+    .file-uploader, .text-input {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        height: 200px; /* Custom height */
+        border: 2px dashed #ccc; /* Custom border style */
+        border-radius: 10px; /* Custom border radius */
+        padding: 10px;
+    }
+    .file-uploader input, .text-input input {
+        width: 100%; /* Full width for input fields */
+        height: 50px; /* Custom height for input fields */
+        margin-bottom: 10px; /* Space between input fields */
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    # Custom text input
-    st.text_input(
-        "Or enter an image URL or base64 data...", 
-        key="image_url", 
-        placeholder="Or enter an image URL or base64 data...",
-        class_="custom-text-input"
-    )
-
-    # Custom file uploader
-    uploaded_file = st.file_uploader(
-        "Choose an image...", 
-        type=["jpg", "jpeg", "png"], 
-        accept_multiple_files=False,
-        class_="custom-file-upload"
-    )
+    st.markdown('<div class="text-input">', unsafe_allow_html=True)
+    st.text_input("Or enter an image URL or base64 data...", key="image_url", placeholder="Or enter an image URL or base64 data...")
+    st.markdown('</div>', unsafe_allow_html=True)
+    
+    st.markdown('<div class="file-uploader">', unsafe_allow_html=True)
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg"], accept_multiple_files=False)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 
 # Right column for displaying the loaded image

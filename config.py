@@ -9,7 +9,7 @@ DATASET_NAME = 'food101'
 DATASET_SPLIT = ['train', 'validation']
 
 ## Model Variables
-BASE = tf.keras.applications.EfficientNetB0(include_top=False)
+BASE = None # tf.keras.applications.EfficientNetB0(include_top=False) ## Uncomment if training
 SHAPE = (224, 224, 3)
 POOLING = tf.keras.layers.GlobalAveragePooling2D(name="GlobalAveragePooling2D")
 ACTIVATION = 'softmax'
