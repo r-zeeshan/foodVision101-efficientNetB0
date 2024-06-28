@@ -1,12 +1,16 @@
-from dataset import get_dataset
-from preprocess import batch_data
-from architecture import create_model
-from callbacks import get_callbacks
+# from dataset import get_dataset
+# from preprocess import batch_data
+# from architecture import create_model
+# from callbacks import get_callbacks
 from config import *
 import pickle
 import os
 import tensorflow as tf
 import tensorflow_datasets as tfds
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping, ReduceLROnPlateau
+from tensorflow.keras.layers import Input, Dense, Activation
+from tensorflow.keras import Model
+
 
 # Set up TPU strategy
 try:
@@ -59,10 +63,25 @@ def run_training():
     class_names = ds_info.features['label'].names
     with strategy.scope():
         base_model = tf.keras.applications.EfficientNetB0(include_top=False)
-        pooling_layer = tf.keras.layers.GlobalAveragePooling2D(name="GlobalAveragePooling2D")
-        optimizer = tf.keras.optimizers.Adam(0.0001)
-        model = create_model(base=base_model, shape=SHAPE, pooling=pooling_layer, activation=ACTIVATION, class_names=class_names, loss=LOSS, optimizer=optimizer, metrics=METRICS)
-        callbacks = get_callbacks() 
+        base_model.trainable = True
+
+        inputs = Input(shape=SHAPE, name='input_layer')
+        x = base_model(inputs)
+        x = tf.keras.layers.GlobalAveragePooling2D(name="GlobalAveragePooling2D")(x)
+        x = Dense(len(class_names))(x)
+        outputs = Activation('softmax', dtype=tf.float32, name='output_layer')(x)
+
+        model = Model(inputs, outputs)
+
+        model.compile(loss=LOSS,
+                    optimizer=tf.keras.optimizers.Adam(0.0001),
+                    metrics=['accuracy'])
+
+        callbacks = [EarlyStopping(monitor='val_loss', patience=3), ReduceLROnPlateau(monitor='val_loss',
+                                factor=0.2,
+                                patience=2,
+                                verbose=1,
+                                min_lr=1e-7)]
 
     ### Training the Model
     history = model.fit(train_data,
