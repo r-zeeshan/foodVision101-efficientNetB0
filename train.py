@@ -25,18 +25,21 @@ callbacks = get_callbacks()
 
 ### Training the Model
 history = model.fit(train_data,
-                    epochs=50,
-                    steps_per_epoch=len(train_data),
+                    epochs=5,
                     validation_data=test_data,
                     callbacks=callbacks)
 
+
+print("Evaluating the Model...")
 model.evaluate(test_data)
+print("Evaluation Complete...")
 
 os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
 os.makedirs(os.path.dirname(HISTORY_PATH), exist_ok=True)
 
 
 ### Saving the Model and the history
+print("\nSaving the Model...")
 model.save(MODEL_PATH)
 
 with open(HISTORY_PATH, 'wb') as file:

@@ -127,8 +127,8 @@ def plot_learning_rate(history, save_path=None):
         history: TensorFlow model History object.
         save_path: Path to save the plot.
     """
-    lr = history['lr']
-    epochs = range(len(history['lr']))
+    lr = history['learning_rate']
+    epochs = range(len(history['learning_rate']))
     plt.plot(epochs, lr, label='learning_rate')
     plt.title('Learning Rate')
     plt.xlabel('Epochs')
