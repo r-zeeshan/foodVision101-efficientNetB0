@@ -7,9 +7,6 @@ from callbacks import get_callbacks
 from config import *
 import pickle
 import os
-
-# train.py
-
 import tensorflow as tf
 
 # Initialize TPU
@@ -18,18 +15,14 @@ tf.config.experimental_connect_to_cluster(resolver)
 tf.tpu.experimental.initialize_tpu_system(resolver)
 strategy = tf.distribute.TPUStrategy(resolver)
 
-
-### Loading and preprocessing the Dataset
-(train_data, test_data), ds_info = get_dataset(name=DATASET_NAME, split=DATASET_SPLIT)
-
-train_data, test_data = batch_data(train_data=train_data, test_data=test_data, strategy=strategy)
-
-class_names = ds_info.features['label'].names
-
-
-# train.py
-
 with strategy.scope():
+    ### Loading and preprocessing the Dataset
+    (train_data, test_data), ds_info = get_dataset(name=DATASET_NAME, split=DATASET_SPLIT)
+
+    train_data, test_data = batch_data(train_data=train_data, test_data=test_data, strategy=strategy)
+
+    class_names = ds_info.features['label'].names
+
     ### Creating the model
     model = create_model(base=BASE, shape=SHAPE, pooling=POOLING, activation=ACTIVATION, class_names=class_names, loss=LOSS, optimizer=OPTIMIZER, metrics=METRICS)
 
@@ -42,19 +35,16 @@ with strategy.scope():
                         validation_data=test_data,
                         callbacks=callbacks)
 
+    print("Evaluating the Model...")
+    model.evaluate(test_data)
+    print("Evaluation Complete...")
 
+    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+    os.makedirs(os.path.dirname(HISTORY_PATH), exist_ok=True)
 
-print("Evaluating the Model...")
-model.evaluate(test_data)
-print("Evaluation Complete...")
+    ### Saving the Model and the history
+    print("\nSaving the Model...")
+    model.save(MODEL_PATH)
 
-os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
-os.makedirs(os.path.dirname(HISTORY_PATH), exist_ok=True)
-
-
-### Saving the Model and the history
-print("\nSaving the Model...")
-model.save(MODEL_PATH)
-
-with open(HISTORY_PATH, 'wb') as file:
-    pickle.dump(history, file)
+    with open(HISTORY_PATH, 'wb') as file:
+        pickle.dump(history, file)
