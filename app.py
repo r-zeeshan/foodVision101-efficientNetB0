@@ -34,54 +34,44 @@ uploaded_file = st.file_uploader("Choose an image...", type="jpg")
 image_url = st.text_input("Or enter an image URL or base64 data...")
 
 def preprocess_and_predict(img):
-    # Preprocess the image
     img = tf.image.resize(img, [224, 224])
-    img = tf.expand_dims(img / 255.0, axis=0)  # Add batch dimension and scale
+    img = tf.expand_dims(img / 255.0, axis=0)
     
-    # Make prediction
     pred_prob = model.predict(img)[0]
     pred_class = class_names[np.argmax(pred_prob)]
 
-    # Plot the top 5 probabilities
     st.write(f"Predicted class: {pred_class}")
-    plot_top_5_probs(pred_prob, class_names)
+    fig = plot_top_5_probs(pred_prob, class_names)
+    st.plotly_chart(fig)
 
 if uploaded_file is not None:
     temp_file_path = os.path.join("temp", uploaded_file.name)
     with open(temp_file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    # Display the uploaded image
-    col1, col2 = st.columns(2)
-    with col1:
+    cols = st.columns(2)
+    with cols[0]:
         st.image(temp_file_path, caption='Processing...', use_column_width=True)
-    with col2:
-        st.write("Classifying...")
 
     img = load_and_prep_image(temp_file_path)
-    preprocess_and_predict(img)
+    with cols[1]:
+        preprocess_and_predict(img)
     
-    # Clean up the temp file
     os.remove(temp_file_path)
 
 elif image_url:
-    st.write("Loading image from URL or base64 data...")
     try:
-        # Check if the URL is a base64 string
         if re.match(r'^data:image\/[a-zA-Z]+;base64,', image_url):
             img = load_image_from_base64(image_url)
         else:
             img = load_image_from_url(image_url)
         
-        # Display the image from URL or base64
-        col1, col2 = st.columns(2)
-        with col1:
+        cols = st.columns(2)
+        with cols[0]:
             st.image(img.numpy(), caption='Processing...', use_column_width=True)
-        with col2:
-            st.write("Classifying...")
-
-        # Preprocess and predict
-        preprocess_and_predict(img)
+        
+        with cols[1]:
+            preprocess_and_predict(img)
 
     except Exception as e:
         st.write(f"Error loading image: {e}")

@@ -306,4 +306,4 @@ def plot_top_5_probs(probs, class_names, save_path=None):
     if save_path:
         fig.write_html(save_path)
     
-    fig.show()
+    return fig
