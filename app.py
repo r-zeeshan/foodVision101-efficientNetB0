@@ -49,7 +49,7 @@ if uploaded_file is not None:
     with open(temp_file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    cols = st.columns(2)
+    cols = st.columns([1, 1])  # Adjust the column width ratio if necessary
     with cols[0]:
         st.image(temp_file_path, caption='Processing...', use_column_width=True)
 
@@ -66,7 +66,7 @@ elif image_url:
         else:
             img = load_image_from_url(image_url)
         
-        cols = st.columns(2)
+        cols = st.columns([1, 1])  # Adjust the column width ratio if necessary
         with cols[0]:
             st.image(img.numpy(), caption='Processing...', use_column_width=True)
         
