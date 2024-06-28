@@ -1,7 +1,7 @@
 import streamlit as st
 import tensorflow as tf
 import numpy as np
-from utils import load_and_prep_image, plot_top_10_probs, load_image_from_url, load_image_from_base64
+from utils import load_and_prep_image, plot_top_5_probs, load_image_from_url, load_image_from_base64
 from config import MODEL_PATH
 import os
 import re
@@ -32,9 +32,8 @@ def preprocess_and_predict(img):
     pred_class = class_names[np.argmax(pred_prob)]
 
     st.write(f"Predicted class: {pred_class}")
-    fig = plot_top_10_probs(pred_prob, class_names)
+    fig = plot_top_5_probs(pred_prob, class_names)
     st.plotly_chart(fig)
-
 
 st.title("Food Image Classification")
 st.write("Upload an image of food, and the model will predict its category.")
@@ -44,8 +43,8 @@ cols = st.columns([1, 2])
 
 # Left column for upload and URL input
 with cols[0]:
-    uploaded_file = st.file_uploader("Choose an image...", type="jpg")
-    st.text_input("Or enter an image URL or base64 data...", key="image_url")
+    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg"], accept_multiple_files=False)
+    st.text_input("Or enter an image URL or base64 data...", key="image_url", placeholder="Or enter an image URL or base64 data...")
 
 # Right column for displaying the loaded image
 with cols[1]:
