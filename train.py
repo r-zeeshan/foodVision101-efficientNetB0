@@ -9,17 +9,13 @@ import pickle
 import os
 import tensorflow as tf
 
-# Initialize TPU
-resolver = tf.distribute.cluster_resolver.TPUClusterResolver()  # Detect the TPU
-tf.config.experimental_connect_to_cluster(resolver)
-tf.tpu.experimental.initialize_tpu_system(resolver)
-strategy = tf.distribute.TPUStrategy(resolver)
 
-with strategy.scope():
+
+with TPU_STRATEGY.scope():
     ### Loading and preprocessing the Dataset
     (train_data, test_data), ds_info = get_dataset(name=DATASET_NAME, split=DATASET_SPLIT)
 
-    train_data, test_data = batch_data(train_data=train_data, test_data=test_data, strategy=strategy)
+    train_data, test_data = batch_data(train_data=train_data, test_data=test_data, strategy=TPU_STRATEGY)
 
     class_names = ds_info.features['label'].names
 
@@ -31,8 +27,10 @@ with strategy.scope():
 
     ### Training the Model
     history = model.fit(train_data,
+                        steps_per_epoch=int(0.1 * len(train_data)),
                         epochs=20,
                         validation_data=test_data,
+                        validation_steps=int(0.1 * len(test_data)),
                         callbacks=callbacks)
 
     print("Evaluating the Model...")
