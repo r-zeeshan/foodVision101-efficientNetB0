@@ -25,7 +25,7 @@ callbacks = get_callbacks()
 
 ### Training the Model
 history = model.fit(train_data,
-                    epochs=5,
+                    epochs=20,
                     validation_data=test_data,
                     callbacks=callbacks)
 
