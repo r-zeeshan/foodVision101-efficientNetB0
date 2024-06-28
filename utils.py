@@ -286,7 +286,7 @@ def load_image_from_base64(base64_str):
     return img
 
 
-def plot_top_5_probs(probs, class_names, save_path=None):
+def plot_top_10_probs(probs, class_names, save_path=None):
     """
     Plots the top 5 probabilities from the model predictions.
     Args:
@@ -294,13 +294,13 @@ def plot_top_5_probs(probs, class_names, save_path=None):
         class_names (list): List of class names.
         save_path (str): Path to save the plot (optional).
     """
-    top_5_indices = np.argsort(probs)[-5:][::-1]
-    top_5_probs = probs[top_5_indices]
-    top_5_class_names = [class_names[i] for i in top_5_indices]
+    top_10_indices = np.argsort(probs)[-10:][::-1]
+    top_10_probs = probs[top_10_indices]
+    top_10_class_names = [class_names[i] for i in top_10_indices]
 
-    fig = px.bar(x=top_5_class_names, y=top_5_probs, 
+    fig = px.bar(x=top_10_class_names, y=top_10_probs, 
                  labels={'x': 'Class', 'y': 'Probability'},
-                 title='Top 5 Predictions')
+                 title='Top 10 Predictions')
     fig.update_layout(yaxis=dict(range=[0, 1]))
 
     if save_path:
