@@ -133,8 +133,10 @@ with strategy.scope():
     # Train the model
     history = model.fit(
         train_data,
+        steps_per_epoch=int(0.1 * len(train_data)),
         epochs=20,
         validation_data=test_data,
+        validation_steps=int(0.1 * len(test_data)),
         callbacks=callbacks
     )
 
