@@ -43,8 +43,21 @@ cols = st.columns([1, 2])
 
 # Left column for upload and URL input
 with cols[0]:
-    uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg"], accept_multiple_files=False)
-    st.text_input("Or enter an image URL or base64 data...", key="image_url", placeholder="Or enter an image URL or base64 data...")
+    st.markdown(
+        """
+        <div style="width: 300px; height: 150px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <p style="margin-bottom: 10px;">Or enter an image URL or base64 data...</p>
+            <div style="margin-bottom: 10px;">
+                <input type="file" style="width: 100%; margin-bottom: 10px;" accept="image/jpeg,image/jpg" onchange="document.getElementById('file-name').value = this.value">
+            </div>
+            <input type="text" id="image_url" style="width: 100%;" placeholder="Or enter an image URL or base64 data...">
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg"], accept_multiple_files=False)
+image_url = st.text_input("Or enter an image URL or base64 data...", key="image_url", placeholder="Or enter an image URL or base64 data...")
 
 # Right column for displaying the loaded image
 with cols[1]:
