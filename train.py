@@ -6,6 +6,7 @@ from config import *
 import pickle
 import os
 import tensorflow as tf
+import tensorflow_datasets as tfds
 
 # Set up TPU strategy
 try:
@@ -21,14 +22,41 @@ except ValueError:
 
 # Define a function to load, preprocess data, and create the model inside the strategy scope
 def run_training():
-    ### Loading and preprocessing the Dataset
-    (train_data, test_data), ds_info = get_dataset(name=DATASET_NAME, split=DATASET_SPLIT)
+    ### Creating the model and other TensorFlow objects inside strategy scope
+     ### Loading and preprocessing the Dataset
+    (train_data, test_data), ds_info = tfds.load(name=DATASET_NAME,
+                                                 split=DATASET_SPLIT,
+                                                 shuffle_files=False,
+                                                 as_supervised=True,
+                                                 with_info=True)
 
-    train_data, test_data = batch_data(train_data=train_data, test_data=test_data)
+    def resize_image(image, label, image_shape=224):
+        """
+        Resize the input image to the specified shape.
+
+        Args:
+            image (tf.Tensor): The input image tensor.
+            label (tf.Tensor): The label tensor.
+            image_shape (int): The desired shape of the image (default: 224).
+
+        Returns:
+            tf.Tensor: The resized image tensor.
+            tf.Tensor: The label tensor.
+        """
+        image = tf.image.resize(image, [image_shape, image_shape])
+        return tf.cast(image, tf.float32), label
+
+    train_data = train_data.map(map_func=resize_image,
+                                num_parallel_calls=tf.data.AUTOTUNE)
+
+    train_data = train_data.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
+
+    test_data = test_data.map(map_func=resize_image,
+                                num_parallel_calls=tf.data.AUTOTUNE)
+
+    test_data= test_data.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
 
     class_names = ds_info.features['label'].names
-
-    ### Creating the model and other TensorFlow objects inside strategy scope
     with strategy.scope():
         base_model = tf.keras.applications.EfficientNetB0(include_top=False)
         pooling_layer = tf.keras.layers.GlobalAveragePooling2D(name="GlobalAveragePooling2D")

@@ -31,12 +31,13 @@ def batch_data(train_data, test_data):
         tuple: A tuple containing the preprocessed and batched train data and test data.
     """
     train_data = train_data.map(map_func=resize_image,
-                                num_parallel_calls=tf.data.AUTOTUNE
-                                ).shuffle(1000).batch(32).prefetch(tf.data.AUTOTUNE)
+                                num_parallel_calls=tf.data.AUTOTUNE)
+
+    train_data = train_data.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
 
     test_data = test_data.map(map_func=resize_image,
-                                num_parallel_calls=tf.data.AUTOTUNE
-                                ).shuffle(1000).batch(32).prefetch(tf.data.AUTOTUNE)
+                                num_parallel_calls=tf.data.AUTOTUNE)
 
+    test_data= test_data.shuffle(buffer_size=1000).batch(batch_size=32).prefetch(buffer_size=tf.data.AUTOTUNE)
     return train_data, test_data
 
