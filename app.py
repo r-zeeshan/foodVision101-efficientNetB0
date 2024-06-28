@@ -51,8 +51,12 @@ if uploaded_file is not None:
     with open(temp_file_path, "wb") as f:
         f.write(uploaded_file.getbuffer())
 
-    st.image(temp_file_path, caption='Uploaded Image.', use_column_width=True)
-    st.write("Classifying...")
+    # Display the uploaded image
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(temp_file_path, caption='Processing...', use_column_width=True)
+    with col2:
+        st.write("Classifying...")
 
     img = load_and_prep_image(temp_file_path)
     preprocess_and_predict(img)
@@ -70,8 +74,11 @@ elif image_url:
             img = load_image_from_url(image_url)
         
         # Display the image from URL or base64
-        st.image(img.numpy(), caption='Image from URL or base64.', use_column_width=True)
-        st.write("Classifying...")
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image(img.numpy(), caption='Processing...', use_column_width=True)
+        with col2:
+            st.write("Classifying...")
 
         # Preprocess and predict
         preprocess_and_predict(img)
