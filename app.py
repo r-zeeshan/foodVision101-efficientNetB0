@@ -1,7 +1,7 @@
 import streamlit as st
 import tensorflow as tf
 import numpy as np
-from utils import load_and_prep_image, plot_top_5_probs, load_image_from_url, load_image_from_base64
+from utils import load_and_prep_image, plot_top_10_probs, load_image_from_url, load_image_from_base64
 from config import MODEL_PATH
 import os
 import re
@@ -32,7 +32,7 @@ def preprocess_and_predict(img):
     pred_class = class_names[np.argmax(pred_prob)]
 
     st.write(f"Predicted class: {pred_class}")
-    fig = plot_top_5_probs(pred_prob, class_names)
+    fig = plot_top_10_probs(pred_prob, class_names)
     st.plotly_chart(fig)
 
 st.title("Food Image Classification")
