@@ -298,7 +298,7 @@ def plot_top_5_probs(probs, class_names, save_path=None):
     top_5_probs = probs[top_5_indices]
     top_5_class_names = [class_names[i] for i in top_5_indices]
 
-    fig = px.bar(x=top_5_probs, y=top_5_class_names, orientation='h',
+    fig = px.bar(x=top_5_class_names, y=top_5_probs, orientation='h',
                  labels={'x': 'Probability', 'y': 'Class'},
                  title='Top 5 Predictions')
     fig.update_layout(xaxis=dict(range=[0, 1]))
