@@ -1,3 +1,5 @@
+# train.py
+
 from dataset import get_dataset
 from preprocess import batch_data
 from architecture import create_model
@@ -6,28 +8,40 @@ from config import *
 import pickle
 import os
 
+# train.py
+
+import tensorflow as tf
+
+# Initialize TPU
+resolver = tf.distribute.cluster_resolver.TPUClusterResolver()  # Detect the TPU
+tf.config.experimental_connect_to_cluster(resolver)
+tf.tpu.experimental.initialize_tpu_system(resolver)
+strategy = tf.distribute.TPUStrategy(resolver)
+
 
 ### Loading and preprocessing the Dataset
 (train_data, test_data), ds_info = get_dataset(name=DATASET_NAME, split=DATASET_SPLIT)
 
-train_data, test_data = batch_data(train_data=train_data, test_data=test_data)
+train_data, test_data = batch_data(train_data=train_data, test_data=test_data, strategy=strategy)
 
 class_names = ds_info.features['label'].names
 
 
-### Creating the model
-model = create_model(base=BASE,shape=SHAPE, pooling=POOLING, activation=ACTIVATION, class_names=class_names, loss=LOSS, optimizer=OPTIMIZER, metrics=METRICS)
+# train.py
 
+with strategy.scope():
+    ### Creating the model
+    model = create_model(base=BASE, shape=SHAPE, pooling=POOLING, activation=ACTIVATION, class_names=class_names, loss=LOSS, optimizer=OPTIMIZER, metrics=METRICS)
 
-### Setting up callbacks
-callbacks = get_callbacks()
+    ### Setting up callbacks
+    callbacks = get_callbacks()
 
+    ### Training the Model
+    history = model.fit(train_data,
+                        epochs=20,
+                        validation_data=test_data,
+                        callbacks=callbacks)
 
-### Training the Model
-history = model.fit(train_data,
-                    epochs=20,
-                    validation_data=test_data,
-                    callbacks=callbacks)
 
 
 print("Evaluating the Model...")

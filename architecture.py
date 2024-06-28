@@ -1,3 +1,5 @@
+# architecture.py
+
 import tensorflow as tf
 from tensorflow.keras.layers import Input, Dense, Activation
 from tensorflow.keras import Model

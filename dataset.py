@@ -1,3 +1,4 @@
+# dataset.py
 import tensorflow_datasets as tfds
 
 
@@ -14,7 +15,7 @@ def get_dataset(name, split):
     """
     (train_data, test_data), ds_info = tfds.load(name=name,
                                                  split=split,
-                                                 shuffle_files=False,
+                                                 shuffle_files=True,
                                                  as_supervised=True,
                                                  with_info=True)
 
