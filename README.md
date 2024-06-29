@@ -9,17 +9,17 @@
 - **Top Predictions**: Displays the top 10 predicted categories with probabilities.
 - **Visualizations**: Uses Plotly to create interactive bar plots of the top predictions.
 
-Project Structure
-├── app.py # Main Streamlit application
-├── architecture.py # Model architecture setup
-├── callbacks.py # Callbacks for model training
-├── config.py # Configuration variables
-├── dataset.py # Dataset loading functions
-├── preprocess.py # Data preprocessing functions
-├── train.py # Model training script
-├── utils.py # Utility functions for prediction and plotting
-└── requirements.txt # Required Python packages
 
+## Project Structure
+├── app.py # Main Streamlit application   
+├── architecture.py # Model architecture setup  
+├── callbacks.py # Callbacks for model training  
+├── config.py # Configuration variables  
+├── dataset.py # Dataset loading functions  
+├── preprocess.py # Data preprocessing functions  
+├── train.py # Model training script  
+├── utils.py # Utility functions for prediction and plotting  
+└── requirements.txt # Required Python packages   
 
 
 ## How to Run
@@ -51,4 +51,4 @@ FoodVision101(https://foodvision101.streamlit.app/)
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Contact
-For any questions or inquiries, please contact [your-email@example.com](mailto:fiverr.zeeshanrajpootkr@gmail.com).
+For any questions or inquiries, please contact [fiverr.zeeshanrajpoot@gmail.com](mailto:fiverr.zeeshanrajpootkr@gmail.com).
