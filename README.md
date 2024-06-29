@@ -9,7 +9,7 @@
 - **Top Predictions**: Displays the top 10 predicted categories with probabilities.
 - **Visualizations**: Uses Plotly to create interactive bar plots of the top predictions.
 
-## Project Structure
+Project Structure
 ├── app.py # Main Streamlit application
 ├── architecture.py # Model architecture setup
 ├── callbacks.py # Callbacks for model training
@@ -19,6 +19,7 @@
 ├── train.py # Model training script
 ├── utils.py # Utility functions for prediction and plotting
 └── requirements.txt # Required Python packages
+
 
 
 ## How to Run
@@ -44,7 +45,7 @@ The model was evaluated on the test dataset, achieving significant accuracy. Bel
 - **Precision, Recall, F1-Score**: Detailed class-wise performance metrics are visualized in the app.
 
 ## Demo
-![Demo GIF](https://foodvision101.streamlit.app/)
+FoodVision101(https://foodvision101.streamlit.app/)
 
 ## Acknowledgments
 - This project uses the [Food101 dataset](https://www.tensorflow.org/datasets/catalog/food101).
