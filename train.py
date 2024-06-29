@@ -24,11 +24,11 @@ model = create_model(base=BASE,shape=SHAPE, pooling=POOLING, activation=ACTIVATI
 callbacks = get_callbacks()
 
 
-model.load_weights(MODEL_PATH)
+model.load_weights(CHECKPOINT_PATH)
 
 ### Training the Model
 history = model.fit(train_data,
-                    epochs=5,
+                    epochs=20,
                     validation_data=test_data,
                     callbacks=callbacks)
 
