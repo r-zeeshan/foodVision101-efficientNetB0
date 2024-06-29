@@ -61,3 +61,4 @@ def get_callbacks():
     return [early_stopping(),
             reduce_lr(),
             model_checkpoint(path=CHECKPOINT_PATH)]
+

@@ -38,3 +38,4 @@ def create_model(base, shape, pooling, activation, class_names, loss, optimizer,
                   metrics=metrics)
 
     return model
+

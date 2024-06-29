@@ -39,10 +39,6 @@ Project Structure
     streamlit run app.py
     ```
 
-## Model Evaluation
-The model was evaluated on the test dataset, achieving significant accuracy. Below are the key performance metrics:
-- **Accuracy**: [Include your model's accuracy here]
-- **Precision, Recall, F1-Score**: Detailed class-wise performance metrics are visualized in the app.
 
 ## Demo
 FoodVision101(https://foodvision101.streamlit.app/)
