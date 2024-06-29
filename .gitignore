@@ -1,3 +1,5 @@
 FoodVision101/
 __pycache__/
 nohup.out
+evaluation.ipynb
+plots/effNetb0_precision_recall_curve.html
