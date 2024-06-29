@@ -8,7 +8,7 @@ def get_dataset(name, split):
 
     Parameters:
     - name (str): The name of the dataset to load.
-    - split (str): The split of the dataset to load (e.g., 'train', 'test').
+    - split (str): The split of the dataset to load (e.g., 'train', 'test', 'validation').
 
     Returns:
     - tuple: A tuple containing the train data, test data, and dataset information.
