@@ -26,7 +26,7 @@ class_names = ['apple_pie', 'baby_back_ribs', 'baklava', 'beef_carpaccio', 'beef
 
 def preprocess_and_predict(img):
     img = tf.image.resize(img, [224, 224])
-    img = tf.expand_dims(img / 255.0, axis=0)
+    img = tf.expand_dims(img, axis=0)
     
     pred_prob = model.predict(img)[0]
     pred_class = class_names[np.argmax(pred_prob)]
