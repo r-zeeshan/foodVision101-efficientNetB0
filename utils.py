@@ -89,7 +89,7 @@ def plot_loss_curves(history, save_path=None):
     fig_acc.show()
 
 
-def load_and_prep_image(filename, img_shape=224, scale=True):
+def load_and_prep_image(filename, img_shape=224):
     """
     Reads in an image from filename, turns it into a tensor, and reshapes it to (img_shape, img_shape, 3).
     Parameters:
@@ -105,10 +105,8 @@ def load_and_prep_image(filename, img_shape=224, scale=True):
     img = tf.image.decode_image(img, channels=3)
     # Resize the image
     img = tf.image.resize(img, [img_shape, img_shape])
-    if scale:
-        return img / 255.0
-    else:
-        return img
+    
+    return img
 
 def load_image_from_url(url):
     response = requests.get(url)
