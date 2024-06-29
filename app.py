@@ -1,7 +1,7 @@
 import streamlit as st
 import tensorflow as tf
 import numpy as np
-from utils import load_and_prep_image, plot_top_10_probs, load_image_from_url, load_image_from_base64
+from utils import load_and_prep_image, plot_top_10_probs, load_image_from_url, load_image_from_base64, create_temp_folder, preprocess_and_predict
 from config import MODEL_PATH
 import os
 import re
@@ -27,18 +27,6 @@ class_names = ['apple_pie', 'baby_back_ribs', 'baklava', 'beef_carpaccio', 'beef
                 'spaghetti_carbonara', 'spring_rolls', 'steak', 'strawberry_shortcake', 'sushi', 'tacos', 'takoyaki',
                 'tiramisu', 'tuna_tartare', 'waffles']
 
-def preprocess_and_predict(img):
-    img = tf.image.resize(img, [224, 224])
-    img = tf.expand_dims(img, axis=0)
-    
-    pred_prob = model.predict(img)[0]
-    pred_class = class_names[np.argmax(pred_prob)]
-    
-    return pred_class, pred_prob
-
-def create_temp_folder(path):
-    if not os.path.exists(path):
-        os.makedirs(path)
 
 st.title("Food Image Classification")
 st.write("Upload an image of food, and the model will predict its category.")
@@ -46,15 +34,14 @@ st.write("Upload an image of food, and the model will predict its category.")
 # Create a two-column layout
 cols = st.columns([1, 2])
 
-# Ensure temp folder exists
 create_temp_folder("temp")
 
-# Left column for upload and URL input
+
 with cols[0]:
     uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg"], accept_multiple_files=False)
     st.text_input("Or enter an image URL or base64 data...", key="image_url", placeholder="Or enter an image URL or base64 data...")
 
-# Right column for displaying the loaded image and predictions
+
 with cols[1]:
     try:
         if uploaded_file is not None:
@@ -62,7 +49,7 @@ with cols[1]:
             with open(temp_file_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
             img = load_and_prep_image(temp_file_path)
-            pred_class, pred_prob = preprocess_and_predict(img)
+            pred_class, pred_prob = preprocess_and_predict(img, model, class_names)
             st.image(temp_file_path, caption=f'Predicted: {pred_class}', use_column_width=True)
             os.remove(temp_file_path)
         elif st.session_state.image_url:
@@ -71,12 +58,12 @@ with cols[1]:
                 img = load_image_from_base64(image_url)
             else:
                 img = load_image_from_url(image_url)
-            pred_class, pred_prob = preprocess_and_predict(img)
+            pred_class, pred_prob = preprocess_and_predict(img, model, class_names)
             st.image(img.numpy(), caption=f'Predicted: {pred_class}', use_column_width=True)
     except Exception as e:
         st.error(f"Error: {e}")
 
-# Display the plot in a full-width row below
+
 if uploaded_file is not None or st.session_state.image_url:
     st.markdown("---")
     try:

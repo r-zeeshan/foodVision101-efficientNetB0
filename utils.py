@@ -6,7 +6,7 @@ import tensorflow as tf
 import base64
 from io import BytesIO
 import requests
-
+import os
 
 def save_plot(plot, filename):
     """Save a plot to the specified file."""
@@ -108,7 +108,53 @@ def load_and_prep_image(filename, img_shape=224):
     
     return img
 
+
+
+def preprocess_and_predict(img, model, class_names):
+    """
+    Preprocesses the input image, predicts the class label and probability using the given model,
+    and returns the predicted class label and probability.
+
+    Args:
+        img (tf.Tensor): The input image tensor.
+        model (tf.keras.Model): The pre-trained model used for prediction.
+        class_names (list): The list of class names.
+
+    Returns:
+        tuple: A tuple containing the predicted class label and probability.
+    """
+    img = tf.image.resize(img, [224, 224])
+    img = tf.expand_dims(img, axis=0)
+    
+    pred_prob = model.predict(img)[0]
+    pred_class = class_names[np.argmax(pred_prob)]
+    
+    return pred_class, pred_prob
+
+def create_temp_folder(path):
+    """
+    Create a temporary folder at the specified path if it doesn't already exist.
+
+    Args:
+        path (str): The path where the temporary folder should be created.
+
+    Returns:
+        None
+    """
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+
 def load_image_from_url(url):
+    """
+    Loads an image from a given URL.
+
+    Args:
+        url (str): The URL of the image.
+
+    Returns:
+        tf.Tensor: The loaded image as a TensorFlow tensor.
+    """
     response = requests.get(url)
     img = tf.image.decode_image(BytesIO(response.content).read(), channels=3)
     return img
