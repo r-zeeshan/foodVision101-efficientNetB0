@@ -6,6 +6,9 @@ from config import MODEL_PATH
 import os
 import re
 
+# Set the page configuration to wide mode
+st.set_page_config(layout="wide")
+
 # Load the trained model
 model = tf.keras.models.load_model(MODEL_PATH)
 
