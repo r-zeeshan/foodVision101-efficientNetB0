@@ -36,11 +36,18 @@ def preprocess_and_predict(img):
     
     return pred_class, pred_prob
 
+def create_temp_folder(path):
+    if not os.path.exists(path):
+        os.makedirs(path)
+
 st.title("Food Image Classification")
 st.write("Upload an image of food, and the model will predict its category.")
 
 # Create a two-column layout
 cols = st.columns([1, 2])
+
+# Ensure temp folder exists
+create_temp_folder("temp")
 
 # Left column for upload and URL input
 with cols[0]:
@@ -49,29 +56,47 @@ with cols[0]:
 
 # Right column for displaying the loaded image and predictions
 with cols[1]:
-    if uploaded_file is not None:
-        temp_file_path = os.path.join("temp", uploaded_file.name)
-        with open(temp_file_path, "wb") as f:
-            f.write(uploaded_file.getbuffer())
-        img = load_and_prep_image(temp_file_path)
-        pred_class, pred_prob = preprocess_and_predict(img)
-        st.image(temp_file_path, caption=f'Predicted: {pred_class}', use_column_width=True)
-        os.remove(temp_file_path)
-    elif st.session_state.image_url:
-        image_url = st.session_state.image_url
-        if re.match(r'^data:image\/[a-zA-Z]+;base64,', image_url):
-            img = load_image_from_base64(image_url)
-        else:
-            img = load_image_from_url(image_url)
-        pred_class, pred_prob = preprocess_and_predict(img)
-        st.image(img.numpy(), caption=f'Predicted: {pred_class}', use_column_width=True)
+    try:
+        if uploaded_file is not None:
+            temp_file_path = os.path.join("temp", uploaded_file.name)
+            with open(temp_file_path, "wb") as f:
+                f.write(uploaded_file.getbuffer())
+            img = load_and_prep_image(temp_file_path)
+            pred_class, pred_prob = preprocess_and_predict(img)
+            st.image(temp_file_path, caption=f'Predicted: {pred_class}', use_column_width=True)
+            os.remove(temp_file_path)
+        elif st.session_state.image_url:
+            image_url = st.session_state.image_url
+            if re.match(r'^data:image\/[a-zA-Z]+;base64,', image_url):
+                img = load_image_from_base64(image_url)
+            else:
+                img = load_image_from_url(image_url)
+            pred_class, pred_prob = preprocess_and_predict(img)
+            st.image(img.numpy(), caption=f'Predicted: {pred_class}', use_column_width=True)
+    except Exception as e:
+        st.error(f"Error: {e}")
 
 # Display the plot in a full-width row below
 if uploaded_file is not None or st.session_state.image_url:
     st.markdown("---")
-    if uploaded_file is not None:
-        fig = plot_top_10_probs(pred_prob, class_names)
-        st.plotly_chart(fig)
-    elif st.session_state.image_url:
-        fig = plot_top_10_probs(pred_prob, class_names)
-        st.plotly_chart(fig)
+    try:
+        if uploaded_file is not None:
+            fig = plot_top_10_probs(pred_prob, class_names)
+            st.plotly_chart(fig)
+        elif st.session_state.image_url:
+            fig = plot_top_10_probs(pred_prob, class_names)
+            st.plotly_chart(fig)
+    except Exception as e:
+        st.error(f"Error: {e}")
+
+
+st.markdown(
+    """
+    <style>
+    footer {visibility: hidden;}
+    .footer {visibility: visible; position: relative; bottom: 10px; text-align: center;}
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+st.markdown('<div class="footer">Developed by Zeeshan Hameed</div>', unsafe_allow_html=True)
